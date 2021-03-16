@@ -69,6 +69,8 @@ export class ManageUserComponent implements OnInit {
     }
 
   }
+  
+  window.URL = window.URL || window.webkitURL;
   onFileSelected(event: Event) {
     const file = (<HTMLInputElement>event.target).files[0];
     if (file) {
@@ -76,15 +78,36 @@ export class ManageUserComponent implements OnInit {
       var reader = new FileReader();
       reader.onload = this._handleReaderLoaded.bind(this);
       reader.readAsBinaryString(file);
+      
+      const img = new Image();
+       img.src = window.URL.createObjectURL( file );
 
+
+       reader.onload = () => {
+
+         const width = img.naturalWidth,
+         const height = img.naturalHeight;
+
+         window.URL.revokeObjectURL( img.src );
+
+         if( width !== 100 && height !== 100 ) {
+            this.error = "photo should be 100 x 100 size"
     }
+         }
+       
   }
+    
 
   _handleReaderLoaded(readerEvt) {
     var binaryString = readerEvt.target.result;
     this.registerForm.get('image').patchValue('data:image/png;base64,' + btoa(binaryString));
   }
 
+
+
+
+
+     
 
   add(event: MatChipInputEvent): void {
     const input = event.input;
